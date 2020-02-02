@@ -14,6 +14,7 @@ public class uichange : MonoBehaviour
     public Client client;
     public bool onopen;
 
+    
     public void change()
     {
         if (open)

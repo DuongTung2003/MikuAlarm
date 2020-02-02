@@ -67,7 +67,7 @@ using TMPro;
 
 public class Client : MonoBehaviour
 {
-    #region private members 	
+    #region Variable	
     private TcpClient socketConnection;
     private Thread clientReceiveThread;
     private const int portNum = 3939;
@@ -90,6 +90,9 @@ public class Client : MonoBehaviour
     public string[] songlist = new string[57];
     public bool connected;
     private int index = 0;
+    public float[] lookposition = new float[2];
+    public bool looking;
+    public LookControl lookControl;
     #endregion
     // Use this for initialization 	
     public void Start()
@@ -97,7 +100,7 @@ public class Client : MonoBehaviour
         if (connected == false)
         {
 
-            if (ip.ip != null || ip.ip != "")
+            if (ip.ip != "")
             {
                 Debug.Log("<" + ip.ip + "/>");
                 hostName = ip.ip;
@@ -181,8 +184,18 @@ public class Client : MonoBehaviour
                             // Convert byte array to string message. 						
                             string serverMessage = Encoding.ASCII.GetString(incommingData);
                             Debug.Log("server message received as: " + serverMessage);
-                            rec[index] = serverMessage;
-                            index += 1;
+                            string[] param = serverMessage.Split(' ');
+                            switch (param[0])
+                                { 
+                                 case "05":
+                                    lookControl.moving_target(param);
+                                    break;
+                                
+                                 default:
+                                     rec[index] = serverMessage;
+                                     index += 1;
+                                     break;
+                        }
                         }
                     }
                 }

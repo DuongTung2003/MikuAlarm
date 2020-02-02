@@ -6,7 +6,7 @@ using TMPro;
 public class Filehandler : MonoBehaviour
 {
 
-    private static string path = "Assets/songlist.txt";
+    //private static string path = "Assets/songlist.txt";
     public string data;
     public string[] songlist;
     public GameObject template;
