@@ -118,6 +118,8 @@ def sendard(variable):
     arddata.timeout = 1
     rec = None
     sleep(1)
+    data = arddata.read_until('\n')
+    return str(data)
     #while rec == None or rec == b'' :
     #    sleep(2)
     #    if rec == None or rec == b'':
@@ -542,13 +544,18 @@ def onclient(c,addr,data):
         
             if commandlist[0] == '00':
                 writeloginf("Breaking loop")
-                lol = haha
+                #lol = LOL     exception => break thread
                 break
-        
+
+                        
+                
 
 
 def serverhandler(alarm):
         alarmtime = alarm
+        with open("./data/songlist.data","r") as filedata:
+            listl = filedata.read().split("~")
+        senddata = alarm + " " + str(len(listl))
         command = 0
         sk = socket.socket()
         try:
@@ -568,14 +575,14 @@ def serverhandler(alarm):
             writelogerr("Cannot open port")
         c, addr = sk.accept() 
         writeloginf('Got connection from'+ str(addr) + " C: "+ str(c))
-        serverthread = threading.Thread(target=onclient, args=(c,addr,alarm,))
+        serverthread = threading.Thread(target=onclient, args=(c,addr,senddata,))
         serverthread.start()
         while GPIO.input(25) == GPIO.LOW:
             sleep(2)
             with open("./data/clientcomm.data","r+") as clientcommandfile:
                 clientcommand = clientcommandfile.read()
                 #clientcommand = clientcommand.replace(' ','')
-                commandlist = clientcommand.split(' ')
+                commandlist = clientcommand.split('|')
                 if commandlist[0]:
                  writeloginf("Reading client command.. "+ str(commandlist[0]))
                 clientcommandfile.close()
@@ -586,6 +593,26 @@ def serverhandler(alarm):
                     backupfile.flush()
                     backupfile.close()
                     break
+                elif commandlist[0] == '02':
+                    # can use Quete
+                    cam = threading.Thread(target=camera, args=())
+                    cam.start()
+                    writeloginf("Starting Camera detection")
+                    while commandlist[0] == '02' and commandlist[1] == '01':
+                     sleep(0.1)
+                     if  commandlist[1] == '01':
+                       with open("./data/CamState.data","w+") as State:
+                        State.write("False")
+                        State.close()
+                       with open("./data/Handpos.data","r") as sendfile:
+                        senddata = sendfile.read()
+                        sendfile.close()
+                        c.send(str(senddata))
+                      
+                    if commandlist[1] == '02':
+                          with open("./data/CamState.data","w+") as State:
+                            State.write("True")
+                            State.close()
                 elif commandlist[0] == "03":
                     alarmtime = commandlist[1]
                     command = 1
@@ -661,7 +688,7 @@ def camera():
     
                 except:
                  print("cannot open file")
-                datafile.write(str(X)+ " "+str(Y))
+                datafile.write(str(X)+ "|"+str(Y))
                 datafile.flush()
                 datafile.close()
 

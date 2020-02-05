@@ -28,7 +28,7 @@ public class setalarm : MonoBehaviour
     }
     public void set()
     {
-        client.mess = "03|"+input.alarm;
+        client.mess = "03 "+input.alarm;
         client.SendMessage();
         confirm.SetActive(true);
     }
