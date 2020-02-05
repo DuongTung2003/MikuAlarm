@@ -93,6 +93,7 @@ public class Client : MonoBehaviour
     public float[] lookposition = new float[2];
     public bool looking;
     public LookControl lookControl;
+
     #endregion
     // Use this for initialization 	
     public void Start()
@@ -184,10 +185,10 @@ public class Client : MonoBehaviour
                             // Convert byte array to string message. 						
                             string serverMessage = Encoding.ASCII.GetString(incommingData);
                             Debug.Log("server message received as: " + serverMessage);
-                            string[] param = serverMessage.Split(' ');
+                            string[] param = serverMessage.Split('|');
                             switch (param[0])
                                 { 
-                                 case "05":
+                                 case "02":
                                     lookControl.moving_target(param);
                                     break;
                                 

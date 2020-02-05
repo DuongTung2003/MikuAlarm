@@ -19,22 +19,82 @@ public class LookControl : MonoBehaviour
     private float[] posbg = new float[2];
     static float t = 0.0f;
     public bool moving;
-    private float reset_time;
-
-
-
+    public string[] recpos = new string[2];
+    public float SpaceX;
+    public float SpaceY;
+    public float Speed;
+    private float tarX;
+    private float tarY;
     public void moving_target(string[] data)
     {
-        Debug.Log("X " + data[1]);
-        Debug.Log("Y " + data[2]);
+        Debug.Log("X " + data[0]);
+        Debug.Log("Y " + data[1]);
+        recpos = data;
 
+        moving = true;
 
+        
     }
 
+    
 
-
-    private void Update()
+    private void FixedUpdate()
     {
+
+        
+            tarX = (float.Parse(recpos[0]) / 100) * 6 - 3;
+            tarY = (float.Parse(recpos[1]) / 100) * 8 - 5;
+            target.position = Vector3.Lerp(target.position, new Vector3(tarX, tarY, 0), Time.deltaTime * Speed);
+          
+
+        #region comment
+        //if (targetmoving)
+        //{
+        //    float tarX = (float.Parse(recpos[0]) / 100) * 8 - 5;
+        //    float tarY = (float.Parse(recpos[1]) / 100) * 6 - 3;
+        //    if (Mathf.Abs(target.position.x) - Mathf.Abs(tarX) < SpaceX + 0.05f)
+        //    {
+        //        target.position = new Vector3(tarX, target.position.y, target.position.z);
+        //        targetmoving = false;
+        //    }
+        //    if (Mathf.Abs(target.position.y) - Mathf.Abs(tarY) < SpaceY + 0.05f)
+        //    {
+        //        target.position = new Vector3(target.position.x, tarY, target.position.z);
+        //        targetmoving = false;
+        //    }
+        //    if (target.position.x != tarX)
+        //    {
+
+        //        if (target.position.x > tarX)
+        //        {
+        //            target.position = new Vector3(target.position.x - SpaceX, target.position.y, target.position.z);
+        //        }
+        //        else if (target.position.x < tarX)
+        //        {
+        //            target.position = new Vector3(target.position.x + SpaceX, target.position.y, target.position.z);
+        //        }
+
+
+        //    }
+        //    if (target.position.y != tarY)
+        //    {
+
+        //        if (target.position.y > tarY)
+        //        {
+        //            target.position = new Vector3(target.position.x, target.position.y - SpaceY, target.position.z);
+        //        }
+        //        else if (target.position.y < tarY)
+        //        {
+        //            target.position = new Vector3(target.position.x, target.position.y + SpaceY, target.position.z);
+        //        }
+
+
+        //    }
+        //    Debug.Log("Moving");
+
+
+        // }
+        #endregion
         Debug.Log("Time: " + time.ToString());
         if (moving == false)
         {
@@ -52,6 +112,8 @@ public class LookControl : MonoBehaviour
         }
         else
         {
+           
+
             controller.interacted = true;
             float targetX = target.position.x;
             float targetY = target.position.y;
