@@ -51,7 +51,7 @@ writeloginf("Client started")
 
 
 try :
-    backupfile = open("backup.txt","r+")
+    backupfile = open("./data/backup.data","r+")
     commnew = backupfile.read()
     
 except:
@@ -198,12 +198,12 @@ def playalarm():
                                      continue
                                  sleep(1)
                                  writeloginf("Good morning!")
-                                 #open("backup.txt", 'w').close()
+                                 #open("./data/backup.data", 'w').close()
                                  try: 
                                      backupfile.close()
                                  except:
                                      writelogerr("Cannot close file")
-                                 backupfile = open("backup.txt","w")
+                                 backupfile = open("./data/backup.data","w")
                                  backupfile.write("10")
                                  backupfile.flush()
                                  backupfile.close()
@@ -503,7 +503,7 @@ def getmusiclist():
     musicdic = os.listdir("./music/")
     musicdic.sort()
     GPIO.output(4, True)
-    with codecs.open("songlist.txt","w+","utf-8") as clientcommandfile:
+    with codecs.open("./data/songlist.data","w+","utf-8") as clientcommandfile:
         for index in musicdic:
             sleep(0.1)
             text = str(musicdic.index(index)) + " | " + index
@@ -523,7 +523,7 @@ def onclient(c,addr,data):
 
         c.send(data.encode())
         sleep(3)
-        file = open("playlist.txt","r").read()
+        file = open("./data/playlist.data","r").read()
         file.replace(" ","")
         if file != "" or file != None:
             c.send(file.encode())
@@ -532,7 +532,7 @@ def onclient(c,addr,data):
             datacode = datacode.decode()
             if datacode:
              writeloginf(("Data: "+datacode))
-            clientcommandfile =  open("clientcomm.txt","w+")
+            clientcommandfile =  open("./data/clientcomm.data","w+")
             clientcommandfile.write(datacode)
             clientcommandfile.flush()    
             datafile = clientcommandfile.read()
@@ -572,7 +572,7 @@ def serverhandler(alarm):
         serverthread.start()
         while GPIO.input(25) == GPIO.LOW:
             sleep(2)
-            with open("clientcomm.txt","r+") as clientcommandfile:
+            with open("./data/clientcomm.data","r+") as clientcommandfile:
                 clientcommand = clientcommandfile.read()
                 clientcommand = clientcommand.replace(' ','')
                 commandlist = clientcommand.split('|')
@@ -581,7 +581,7 @@ def serverhandler(alarm):
                 clientcommandfile.close()
 
                 if commandlist[0] == "00":
-                    backupfile = open("clientcomm.txt","w")
+                    backupfile = open("./data/clientcomm.data","w")
                     backupfile.write("01")
                     backupfile.flush()
                     backupfile.close()
@@ -591,7 +591,7 @@ def serverhandler(alarm):
                     command = 1
                 elif commandlist[0] =="04":
                     #playlist
-                    with open("playlist.txt","w") as playlist:
+                    with open("./data/playlist.data","w") as playlist:
                         stringwrite = clientcommand
                         stringwrite = stringwrite.replace("04|","")
                         playlist.write(stringwrite)
@@ -615,7 +615,7 @@ commandcode = [0,0]
 alarmtime = '07:20'
 
 try:
-    alarmtime = open("alarm.txt","r").read()
+    alarmtime = open("./data/alarm.data","r").read()
 except:
     writeloginf("Cannot read alarm")
 sleep(1)
@@ -625,7 +625,7 @@ def datafilehandler(inputdata,mode):
     pass
 
   #FIX LATER
-    #datafile = open("data.txt","r+")
+    #datafile = open("./data/data.data","r+")
     #print(datafile.read() + "/")
     #datals = datafile.readline()
     #data = float(datals)
@@ -638,7 +638,7 @@ def datafilehandler(inputdata,mode):
 
 
 
-    #datafile = open("data.dat","r+")
+    #datafile = open("./data/data.dat","r+")
     #print(datafile.readline())
     #datals = datafile.readlines()
     #data = [[],[],[],[],[],[],[],[],[]]
@@ -665,14 +665,14 @@ def datafilehandler(inputdata,mode):
     #datafile.close()
     
 try :
-    datafile = open("data.txt","r")
+    datafile = open("./data/data.data","r")
     datals = datafile.read()
     datafilehandler(logname,3)
     
 except:
     writelogerr("Cannot open file data")
 def returnfile():
-    commnew = open("backup.txt","r").read()
+    commnew = open("./data/backup.data","r").read()
     commnew = commnew.replace(' ','')
     comm = ''
     for i in range(0, len(commnew)): 
@@ -682,7 +682,7 @@ def returnfile():
     return comm
 def returnalarm(data):
     writeloginf("Setting up alarm..")
-    commnew = open("alarm.txt","r").read()
+    commnew = open("./data/alarm.data","r").read()
     commnew = commnew.replace(' ','')
     comm = ''
     for i in range(0, len(commnew)): 
@@ -690,7 +690,7 @@ def returnalarm(data):
         comm = comm + commnew[i] 
     
     try:
-        writeal = open("alarm.txt","w")
+        writeal = open("./data/alarm.data","w")
         writeal.write(data)
         writeal.close()
     except:
@@ -707,7 +707,7 @@ try:
     backupfile.close()
 except:
     writelogerr("Cannot close file")
-backupfile = open("backup.txt","w")
+backupfile = open("./data/backup.data","w")
 backupfile.write("")
 backupfile.flush()
 backupfile.close()
@@ -729,7 +729,7 @@ while True:
         else:
             commandcode = [0,1]
         GPIO.output(4, False)
-        #open("backup.txt", 'w').close()
+        #open("./data/backup.data", 'w').close()
         
         sleep(0.5)
         #backupfile.write("10")
@@ -739,7 +739,7 @@ while True:
             backupfile.close()
         except:
             writelogerr("Cannot close file")
-        backupfile = open("backup.txt","w")
+        backupfile = open("./data/backup.data","w")
         backupfile.write("10")
         backupfile.flush()
         backupfile.close()
@@ -747,7 +747,7 @@ while True:
     if comm == "02":
         writeloginf("Music detected")
         commandcode = [2,0]
-       # open("backup.txt", 'w').close()
+       # open("./data/backup.data", 'w').close()
         sleep(0.5)
         #backupfile.write("10")
         #backupfile.truncate(2)
@@ -756,13 +756,13 @@ while True:
             backupfile.close()
         except:
             writelogerr("Cannot close file")
-        backupfile = open("backup.txt","w")
+        backupfile = open("./data/backup.data","w")
         backupfile.write("10")
         backupfile.flush()
         backupfile.close()
         comm = returnfile()
     if comm == "03":
-        #open("backup.txt", 'w').close()
+        #open("./data/backup.data", 'w').close()
         #sleep(0.5)
         #backupfile.write("10")
         #backupfile.truncate(2)
@@ -771,7 +771,7 @@ while True:
             backupfile.close()
         except:
             writelogerr("Cannot close file")
-        backupfile = open("backup.txt","w")
+        backupfile = open("./data/backup.data","w")
         backupfile.write("10")
         backupfile.flush()
         backupfile.close()
@@ -834,7 +834,7 @@ while True:
         
          if commandcode[0] == 2 and commandcode[1] == 0:
              #play music
-             #open("backup.txt", 'w').close()
+             #open("./data/backup.data", 'w').close()
              
              #backupfile.write("02")
              #backupfile.flush()
@@ -842,12 +842,12 @@ while True:
                  backupfile.close()
              except:
                  writelogerr("Cannot close file")
-             backupfile = open("backup.txt","w")
+             backupfile = open("./data/backup.data","w")
              backupfile.write("02")
              backupfile.flush()
              backupfile.close()
              playrandomloop(False,"./music1/",[])
-             #open("backup.txt", 'w').close()
+             #open("./data/backup.data", 'w').close()
              
              #backupfile.write("10")
              #backupfile.flush()
@@ -855,13 +855,13 @@ while True:
                  backupfile.close()
              except:
                  writelogerr("Cannot close file")
-             backupfile = open("backup.txt","w")
+             backupfile = open("./data/backup.data","w")
              backupfile.write("10")
              backupfile.flush()
              backupfile.close()
              commandcode = [0,0]
          elif commandcode[0] == 4:
-             playlist =  open("playlist.txt","r") 
+             playlist =  open("./data/playlist.data","r") 
              plstr = playlist.read()
              plstr = plstr.replace(' ','')
              plstrls = plstr.split('|')
@@ -888,7 +888,7 @@ while True:
                     backupfile.close()
                  except:
                   writelogerr("Cannot close file")
-                 backupfile = open("backup.txt","w+")
+                 backupfile = open("./data/backup.data","w+")
                  backupfile.write("01")
                  backupfile.flush()
                  comm = backupfile.read()
@@ -905,7 +905,7 @@ while True:
                  pygame.mixer.music.play()
          elif commandcode[0] == 5 and commandcode[1] == 0:
              #play music
-             #open("backup.txt", 'w').close()
+             #open("./data/backup.data", 'w').close()
              
              #backupfile.write("02")
              #backupfile.flush()
@@ -913,12 +913,12 @@ while True:
                  backupfile.close()
              except:
                  writelogerr("Cannot close file")
-             backupfile = open("backup.txt","w")
+             backupfile = open("./data/backup.data","w")
              backupfile.write("02")
              backupfile.flush()
              backupfile.close()
              playrandomloop(False,"./music/",[])
-             #open("backup.txt", 'w').close()
+             #open("./data/backup.data", 'w').close()
              
              #backupfile.write("10")
              #backupfile.flush()
@@ -926,7 +926,7 @@ while True:
                  backupfile.close()
              except:
                  writelogerr("Cannot close file")
-             backupfile = open("backup.txt","w")
+             backupfile = open("./data/backup.data","w")
              backupfile.write("10")
              backupfile.flush()
              backupfile.close()
@@ -943,7 +943,7 @@ while True:
               backupfile.close()
              except:
               writelogerr("Cannot close file")
-             backupfile = open("backup.txt","w+")
+             backupfile = open("./data/backup.data","w+")
              backupfile.write("01")
              backupfile.flush()
              comm = backupfile.read()
@@ -981,7 +981,7 @@ while True:
               backupfile.close()
              except:
               writelogerr("Cannot close file")
-             backupfile = open("backup.txt","w+")
+             backupfile = open("./data/backup.data","w+")
              backupfile.write("01")
              backupfile.flush()
              comm = backupfile.read()
@@ -998,7 +998,7 @@ while True:
              pygame.mixer.music.play()
          elif commandcode[1] == 3 and commandcode[0] == 3:
              writeloginf("Test")
-             #open("backup.txt", 'w').close()
+             #open("./data/backup.data", 'w').close()
              
              #backupfile.write("03")
              #backupfile.flush()
@@ -1006,7 +1006,7 @@ while True:
                  backupfile.close()
              except:
                  writelogerr("Cannot close file")
-             backupfile = open("backup.txt","w")
+             backupfile = open("./data/backup.data","w")
              backupfile.write("03")
              backupfile.flush()
              backupfile.close()
@@ -1016,7 +1016,7 @@ while True:
              count = 0
              delay = 600   #sec    10m
             
-             #open("backup.txt", 'w').close()
+             #open("./data/backup.data", 'w').close()
              
              #backupfile.write("01")
              #backupfile.flush()
@@ -1024,7 +1024,7 @@ while True:
                  backupfile.close()
              except:
                  writelogerr("Cannot close file")
-             backupfile = open("backup.txt","w+")
+             backupfile = open("./data/backup.data","w+")
              backupfile.write("01")
              backupfile.flush()
              comm = backupfile.read()
@@ -1067,7 +1067,7 @@ while True:
                         backupfile.close()
                       except:
                         writelogerr("Cannot close file")
-                        backupfile = open("backup.txt","w")
+                        backupfile = open("./data/backup.data","w")
                         backupfile.write("10")
                         backupfile.flush()
                         backupfile.close()
@@ -1111,7 +1111,7 @@ while True:
                  continue
          elif commandcode[0] == 9:
 
-               #open("backup.txt", 'w').close()
+               #open("./data/backup.data", 'w').close()
                #backupfile.flush()
                #backupfile.write("10")
                #backupfile.flush()
@@ -1120,7 +1120,7 @@ while True:
                  backupfile.close()
                 except:
                     writelogerr("Cannot close file")
-                    backupfile = open("backup.txt","w")
+                    backupfile = open("./data/backup.data","w")
                     backupfile.write("10")
                     backupfile.flush()
                     backupfile.close()

@@ -1,4 +1,5 @@
-﻿//using System;
+﻿#region Comment
+//using System;
 //using System.Net.Sockets;
 //using System.Text;
 //using UnityEngine;
@@ -55,6 +56,7 @@
 
 //    }
 //}
+#endregion
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -76,7 +78,7 @@ public class Client : MonoBehaviour
     public string alarmset = "06:00";
     public bool setalarm = false;
     //private const string hostName = "127.0.1.1";
-    public string[] rec;
+    public string rec;
     public texthandler ip;
     public string mess;
     private bool connection;
@@ -92,7 +94,7 @@ public class Client : MonoBehaviour
     private int index = 0;
     public float[] lookposition = new float[2];
     public bool looking;
-    public LookControl lookControl;
+
 
     #endregion
     // Use this for initialization 	
@@ -185,18 +187,7 @@ public class Client : MonoBehaviour
                             // Convert byte array to string message. 						
                             string serverMessage = Encoding.ASCII.GetString(incommingData);
                             Debug.Log("server message received as: " + serverMessage);
-                            string[] param = serverMessage.Split('|');
-                            switch (param[0])
-                                { 
-                                 case "02":
-                                    lookControl.moving_target(param);
-                                    break;
-                                
-                                 default:
-                                     rec[index] = serverMessage;
-                                     index += 1;
-                                     break;
-                        }
+                            rec = serverMessage;
                         }
                     }
                 }
@@ -205,14 +196,14 @@ public class Client : MonoBehaviour
             {
                 connection = false;
                 Debug.Log("Socket exception: " + socketException);
-                if (count < iplist.Length)
-                {
-                    hostName = iplist[count];
-                    count += 1;
-                }
+                //if (count < iplist.Length)
+                //{
+                //    hostName = iplist[count];
+                //    count += 1;
+                //}
+                 
 
-
-                Start();
+                //Start();
                 return;
             }
         }
@@ -237,7 +228,8 @@ public class Client : MonoBehaviour
                 byte[] clientMessageAsByteArray = Encoding.ASCII.GetBytes(mess);
                 // Write byte array to socketConnection stream.                 
                 stream.Write(clientMessageAsByteArray, 0, clientMessageAsByteArray.Length);
-                Debug.Log("Client sent his message - should be received by server");
+                Debug.Log("Client sent his message - should be received by server, Data: "+mess);
+                mess = "";
             }
         }
         catch (SocketException socketException)

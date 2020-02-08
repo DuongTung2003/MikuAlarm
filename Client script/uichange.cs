@@ -13,8 +13,35 @@ public class uichange : MonoBehaviour
     public bool Self;
     public Client client;
     public bool onopen;
+    public bool onStart;
+    private void Start()
+    {
+        if (onStart)
+        {
 
-    
+            if (open)
+            {
+                open.SetActive(true);
+            }
+
+            if (open2)
+            {
+                open2.SetActive(true);
+            }
+            if (close)
+            {
+                close.SetActive(false);
+            }
+            if (close2)
+            {
+                close2.SetActive(false);
+            }
+            if (Self)
+            {
+                gameObject.SetActive(false);
+            }
+        }
+    }
     public void change()
     {
         if (open)

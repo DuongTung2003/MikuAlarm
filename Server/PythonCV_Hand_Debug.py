@@ -69,7 +69,7 @@ def cap():
     count += 1
 
 trycap = False
-cascPath = "haarcascade_frontalface_default.xml"   #Hand
+cascPath = "haarcascade_frontalface_default.xml"   #Hand detection menthod
 faceCascade = cv2.CascadeClassifier(cascPath)
     
 video_capture = cv2.VideoCapture(0)

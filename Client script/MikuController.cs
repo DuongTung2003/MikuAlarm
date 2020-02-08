@@ -41,6 +41,13 @@ public class MikuController : MonoBehaviour
     }
     void Update()
     {
+
+        if (animator.GetInteger("State_ID") == 4  && interacted == true )
+        {
+            animator.SetInteger("State_ID", 2);
+            interacted = false;
+        }
+       
         try
         {
             looking = client.looking;
@@ -59,7 +66,7 @@ public class MikuController : MonoBehaviour
 
                 refreshtime = Time.time;
                 Debug.Log("Idle mode");
-                Debug.Log("Time: " + (Time.time - startTime).ToString());
+                //Debug.Log("Time: " + (Time.time - startTime).ToString());
                 if (startTime + delaytime < Time.time && looking == false)
                 {
                     startTime = Time.time;

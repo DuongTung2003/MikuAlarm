@@ -12,7 +12,7 @@
 
 
 #----------------------------------------------------IMPORT AND SETUP----------------------------------------------------------------------------------------------------
-import sys
+import sys, errno
 import cv2           
 import pygame
 import RPi.GPIO as GPIO
@@ -30,6 +30,7 @@ import serial
 import socket
 import netifaces as ni
 import codecs
+from signal import signal,SIGPIPE,SIG_DFL
 try:
     os.mkdir("LogFiles/")
 except :
@@ -528,7 +529,10 @@ def onclient(c,addr,data):
         file = open("./data/playlist.data","r").read()
         file.replace(" ","")
         if file != "" or file != None:
+
             c.send(file.encode())
+      
+
         while True :
             datacode = c.recv(1024)
             datacode = datacode.decode()
@@ -538,10 +542,13 @@ def onclient(c,addr,data):
             clientcommandfile.write(datacode)
             clientcommandfile.flush()    
             datafile = clientcommandfile.read()
-            clientcommandfile.close()
             datafile = datafile.replace(' ','')
             commandlist = datafile.split('|')
-        
+            sleep(1)
+            clientcommandfile.write("")
+            clientcommandfile.flush()  
+            clientcommandfile.close()
+
             if commandlist[0] == '00':
                 writeloginf("Breaking loop")
                 #lol = LOL     exception => break thread
@@ -552,6 +559,9 @@ def onclient(c,addr,data):
 
 
 def serverhandler(alarm):
+        signal(SIGPIPE,SIG_DFL)
+        open("./data/clientcomm.data","w+").close()
+        cameraActive = False;
         alarmtime = alarm
         with open("./data/songlist.data","r") as filedata:
             listl = filedata.read().split("~")
@@ -578,7 +588,7 @@ def serverhandler(alarm):
         serverthread = threading.Thread(target=onclient, args=(c,addr,senddata,))
         serverthread.start()
         while GPIO.input(25) == GPIO.LOW:
-            sleep(2)
+            sleep(0.1)
             with open("./data/clientcomm.data","r+") as clientcommandfile:
                 clientcommand = clientcommandfile.read()
                 #clientcommand = clientcommand.replace(' ','')
@@ -598,18 +608,11 @@ def serverhandler(alarm):
                     cam = threading.Thread(target=camera, args=())
                     cam.start()
                     writeloginf("Starting Camera detection")
-                    while commandlist[0] == '02' and commandlist[1] == '01':
-                     sleep(0.1)
-                     if  commandlist[1] == '01':
-                       with open("./data/CamState.data","w+") as State:
-                        State.write("False")
-                        State.close()
-                       with open("./data/Handpos.data","r") as sendfile:
-                        senddata = sendfile.read()
-                        sendfile.close()
-                        c.send(str(senddata))
+                    if  commandlist[1] == '01':
+                       cameraActive = True;
                       
                     if commandlist[1] == '02':
+                          cameraActive = False;
                           with open("./data/CamState.data","w+") as State:
                             State.write("True")
                             State.close()
@@ -625,6 +628,31 @@ def serverhandler(alarm):
                         playlist.close()
 
                     command = 2
+                elif commandlist[0] == "05":
+                    #weather data
+                    key = "41b26fc85ad1fd789f3064de7fa81cd6"
+                    location = 'Lang Son,VN'
+                    owm = pyowm.OWM(key)
+                    observation = owm.weather_at_place(location)
+                    w = observation.get_weather()
+                    writeloginf(w.get_status()) 
+                    data = w.get_status()
+
+                    #--arduino
+                    temp = "16"
+                    hum = "70"
+                    #--
+                    respond = "05|"+temp+"|"+hum+"|"+str(data)
+                    c.send(respond.encode())
+
+                if cameraActive:
+                     with open("./data/CamState.data","w+") as State:
+                        State.write("False")
+                        State.close()
+                     with open("./data/Handpos.data","r") as sendfile:
+                          senddata = sendfile.read()
+                          sendfile.close()
+                          c.send(str(senddata))
         GPIO.output(4, False)
         
         return alarmtime,command
@@ -805,6 +833,7 @@ backupfile.flush()
 backupfile.close()
 #lcd.main()
 #---------------------------------------------------------------  MAIN  -------------------------------------------------------------------------
+commandcode = [3,0]
 while True:
 
     sleep(0.01)

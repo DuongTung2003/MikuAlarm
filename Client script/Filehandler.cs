@@ -57,9 +57,9 @@ public class Filehandler : MonoBehaviour
                 Transform transnum = clonetrans.Find("num");
                 transsong.GetComponent<Text>().text = songlist[a];
                 transnum.GetComponent<TextMeshProUGUI>().text = a.ToString() + "|";
-                if (client.rec[1] != "")
+                if (client.rec != "")
                 {
-                    string recsong = client.rec[1];
+                    string recsong = client.rec;
                     recsong += "|" + songlist.Length.ToString();
                     string[] reclist = recsong.Split('|');
                     for (int i = 0; i < reclist.Length; i++)
@@ -98,7 +98,7 @@ public class Filehandler : MonoBehaviour
         {
             filehandler.sendserver = "04";
             filehandler.currentsong = 0;
-            client.rec[1] = "";
+            client.rec = "";
             filehandler.Start();
         }
         else

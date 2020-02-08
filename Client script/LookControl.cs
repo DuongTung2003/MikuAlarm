@@ -35,17 +35,31 @@ public class LookControl : MonoBehaviour
 
         
     }
-
+    public void OnActive(bool State)
+    {
+        if (State)
+        {
+            client.mess = "02|01";
+            client.SendMessage();
+        }
+        else
+        {
+            client.mess = "02|02";
+            client.SendMessage();
+        }
+        Debug.Log("Sent camera state "+ State);
+    }
     
 
     private void FixedUpdate()
     {
 
-        
+        if (recpos[0] != "")
+        {
             tarX = (float.Parse(recpos[0]) / 100) * 6 - 3;
             tarY = (float.Parse(recpos[1]) / 100) * 8 - 5;
             target.position = Vector3.Lerp(target.position, new Vector3(tarX, tarY, 0), Time.deltaTime * Speed);
-          
+        }
 
         #region comment
         //if (targetmoving)
@@ -95,7 +109,7 @@ public class LookControl : MonoBehaviour
 
         // }
         #endregion
-        Debug.Log("Time: " + time.ToString());
+        //Debug.Log("Time: " + time.ToString());
         if (moving == false)
         {
             bgX = animator.GetFloat("LookPosHoz");

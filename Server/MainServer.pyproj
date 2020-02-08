@@ -23,11 +23,9 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Adafruit_CharLCD.py" />
     <Compile Include="Commandlist.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="lcd.py" />
     <Compile Include="Main.py">
       <SubType>Code</SubType>
     </Compile>
