@@ -1,62 +1,4 @@
-﻿#region Comment
-//using System;
-//using System.Net.Sockets;
-//using System.Text;
-//using UnityEngine;
-//using UnityEngine.UI;
-//using TMPro;
-//public class Client : MonoBehaviour
-//{
-//    private const int portNum = 3939;
-//    private string hostName = "192.168.0.106";
-//    public TMP_Text StatusText;
-//    public string alarmset = "06:00";
-//    public bool setalarm = false;
-//    //private const string hostName = "127.0.1.1";
-//    public Text ip;
-//    public void startconnect()
-//    {
-//        if (ip.text != null || ip.text != "")
-//        {
-//            hostName = ip.text;
-//        }
-//        try
-//        {   
-//            var client = new TcpClient(hostName, portNum);
-//            StatusText.text = "Server Online";
-//            StatusText.color = new Color(0, 255, 0);
-
-//            NetworkStream ns = client.GetStream();
-
-
-//               byte[] bytes = new byte[1024];
-//               int bytesRead = ns.Read(bytes, 0, bytes.Length);
-//               string alarm = Encoding.ASCII.GetString(bytes, 0, bytesRead);
-//            while (setalarm == false)
-//                   {
-
-//                   }
-//            byte[] bytesent = new byte[1024];
-//            bytesent =  System.Text.Encoding.ASCII.GetBytes(alarmset);
-//            ns.Write(bytesent,0,bytesent.Length);
-//            Debug.Log(alarm);
-//            ns.Close();
-//            client.Close();
-
-
-
-//        }
-//        catch (Exception e)
-//        {
-//            StatusText.text = "Connect failed";
-//            StatusText.color = new Color(255, 0, 0);
-//            Debug.LogError(e.ToString());
-//        }
-
-
-//    }
-//}
-#endregion
+﻿
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -133,6 +75,7 @@ public class Client : MonoBehaviour
             
             if (Time.time >= currenttime + 2)
             {
+
                 open.SetActive(true);
                 close.SetActive(false);
                 move.position += new Vector3(0,5000, 0);

@@ -24,7 +24,7 @@ public class MikuController : MonoBehaviour
     public void startanim()
     {
        
-        state_ID = Random.Range(0, 2);
+        state_ID = 0;//Random.Range(0, 2);
         Debug.Log("Random ID:" + state_ID);
         animator.SetInteger("State_ID", state_ID);
         switch (state_ID)
@@ -32,12 +32,18 @@ public class MikuController : MonoBehaviour
             case 0:
                 hellowav.Play();
                 break;
-            case 1:
-                nicetomeetuwav.Play();
-                break;
+            //case 1:
+                //nicetomeetuwav.Play();
+               // break;
             default:
                 break;
         }
+    }
+    public void Hi()
+    {
+        state_ID = 1;
+        animator.SetInteger("State_ID", state_ID);
+        nicetomeetuwav.Play();
     }
     void Update()
     {

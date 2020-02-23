@@ -15,9 +15,9 @@ public class DebugScript : MonoBehaviour
             data1 = Random.Range(0, 100).ToString();
             data2 = Random.Range(0, 100).ToString();
         }
-        string[] data = new string[2];
-        data[0] = data1;
-        data[1] = data2;
+        string[] data = new string[3];
+        data[1] = data1;
+        data[2] = data2;
         control.moving_target( data);
     }
 

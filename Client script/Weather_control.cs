@@ -12,7 +12,7 @@ public class Weather_control : MonoBehaviour
     public Sprite[] spritespack = new Sprite[18];
     public Image image;
     public Client client;
-
+    public Toggle toggle;
 public void Active(string[] datapack)
     {
         animator.SetBool("Active", true);
@@ -20,10 +20,13 @@ public void Active(string[] datapack)
         temp.text = datapack[1]+ "°C";
         hum.text = datapack[2] + "%";
         //Fetch weather data
-        switch (datapack[3])
+        switch (datapack[3].ToLower())
         {
             case "rain":
                 image.sprite = spritespack[7];
+                break;
+            case "clouds":
+                image.sprite = spritespack[0];
                 break;
             default:
 
@@ -32,7 +35,16 @@ public void Active(string[] datapack)
     }
 public void request_data()
     {
-        client.mess = "05";
+        
+        if (toggle.isOn)
+        {
+            client.mess = "05|1";
+
+        }
+        else
+        {
+            client.mess = "05|0";
+        }
         client.SendMessage();
     }
     public void Off()

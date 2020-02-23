@@ -15,6 +15,7 @@ public class Data_handler : MonoBehaviour
         {
             case "02":
                 lookControl.moving_target(param);
+                client.looking = true;
                 break;
             case "05":
                 Weathercontrol.Active(param);

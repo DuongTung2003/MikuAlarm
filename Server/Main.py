@@ -6,7 +6,7 @@
 
 
 #Button: 7 inside 25 outside
-#LED: 18 red 14 yellow  4 blinking led 24 green
+#LED: 18 red 14 yellow  4 blinking led 24 green 23 relay
 
 #Note: assignment  a= x if x else y
 
@@ -30,6 +30,7 @@ import serial
 import socket
 import netifaces as ni
 import codecs
+import Adafruit_DHT
 from signal import signal,SIGPIPE,SIG_DFL
 try:
     os.mkdir("LogFiles/")
@@ -74,10 +75,12 @@ GPIO.setup(14, GPIO.OUT)
 GPIO.setup(4, GPIO.OUT)
 GPIO.setup(7, GPIO.IN,pull_up_down=GPIO.PUD_DOWN)
 GPIO.setup(25, GPIO.IN,pull_up_down=GPIO.PUD_DOWN)
+GPIO.setup(23, GPIO.OUT)
 GPIO.output(18, False)
 GPIO.output(14, False)
 GPIO.output(4, False)
 GPIO.output(24, False)
+GPIO.output(23, False)
 sleep(1)
 start_time = time.time()
 ardconnected = False
@@ -232,7 +235,7 @@ def playalarm():
 
 
 
-def playrandomloop(turnalarm,dir,customplaylist):
+def PlayMusic(turnalarm,dir,customplaylist):
     musicvol = 10.0
     commandcode = [0,0]
     limitsong = 0
@@ -549,15 +552,24 @@ def onclient(c,addr,data):
             clientcommandfile.flush()  
             clientcommandfile.close()
 
-            if commandlist[0] == '00':
+            if commandlist[0] == "00":
                 writeloginf("Breaking loop")
-                #lol = LOL     exception => break thread
-                break
+                quit()
 
                         
-                
-
-
+def Read_DHT():
+    sensor = Adafruit_DHT.DHT11
+    pin = 23
+    humidity, temperature = Adafruit_DHT.read(sensor, pin)
+    if humidity is not None and temperature is not None:
+     print('Temp={0:0.1f}*C  Humidity={1:0.1f}%'.format(temperature, humidity))
+     hum = '{0:0.1f}'.format(humidity)
+     temp = '{1:0.1f}'.format(temperature)
+    else:
+     print('Failed to get reading. Try again!')
+     hum = "00"
+     temp = "0"
+    return temp,hum
 def serverhandler(alarm):
         signal(SIGPIPE,SIG_DFL)
         open("./data/clientcomm.data","w+").close()
@@ -589,8 +601,10 @@ def serverhandler(alarm):
         serverthread.start()
         while GPIO.input(25) == GPIO.LOW:
             sleep(0.1)
+           
             with open("./data/clientcomm.data","r+") as clientcommandfile:
                 clientcommand = clientcommandfile.read()
+                open("./data/clientcomm.data","w+").close()
                 #clientcommand = clientcommand.replace(' ','')
                 commandlist = clientcommand.split('|')
                 if commandlist[0]:
@@ -607,18 +621,20 @@ def serverhandler(alarm):
                     # can use Quete
                     cam = threading.Thread(target=camera, args=())
                     cam.start()
-                    writeloginf("Starting Camera detection")
+                    
                     if  commandlist[1] == '01':
                        cameraActive = True;
-                      
+                       writeloginf("Starting Camera detection")
                     if commandlist[1] == '02':
                           cameraActive = False;
                           with open("./data/CamState.data","w+") as State:
                             State.write("True")
                             State.close()
+                            writeloginf("Stopping Camera detection")
                 elif commandlist[0] == "03":
                     alarmtime = commandlist[1]
                     command = 1
+                    open("./data/clientcomm.data","w+").close()
                 elif commandlist[0] =="04":
                     #playlist
                     with open("./data/playlist.data","w") as playlist:
@@ -626,10 +642,11 @@ def serverhandler(alarm):
                         stringwrite = stringwrite.replace("04 ","")
                         playlist.write(stringwrite)
                         playlist.close()
-
+                    open("./data/clientcomm.data","w+").close()
                     command = 2
                 elif commandlist[0] == "05":
                     #weather data
+                    open("./data/clientcomm.data","w+").close()
                     key = "41b26fc85ad1fd789f3064de7fa81cd6"
                     location = 'Lang Son,VN'
                     owm = pyowm.OWM(key)
@@ -638,13 +655,22 @@ def serverhandler(alarm):
                     writeloginf(w.get_status()) 
                     data = w.get_status()
 
-                    #--arduino
-                    temp = "16"
-                    hum = "70"
+                    #--DHT_22
+                    if commandlist[1] == "1" :
+                        temp,hum = Read_DHT()
+                    else:
+                           temp = "00"
+                    if temp == "00":
+                       temp =  w.get_temperature(unit='celsius')["temp"]
+                       hum = str(w.get_humidity()) 
                     #--
-                    respond = "05|"+temp+"|"+hum+"|"+str(data)
+                    respond = "05|"+str(temp)+"|"+hum+"|"+str(data)
                     c.send(respond.encode())
-
+                elif commandlist[0] == "06":
+                    if commandlist[1] == "0":
+                        GPIO.output(23, True)
+                    elif commandlist[1] == "1":
+                        GPIO.output(23, False)
                 if cameraActive:
                      with open("./data/CamState.data","w+") as State:
                         State.write("False")
@@ -652,9 +678,9 @@ def serverhandler(alarm):
                      with open("./data/Handpos.data","r") as sendfile:
                           senddata = sendfile.read()
                           sendfile.close()
-                          c.send(str(senddata))
+                          c.send(str(senddata).encode())
         GPIO.output(4, False)
-        
+         
         return alarmtime,command
 
 
@@ -682,7 +708,7 @@ def camera():
                  state = open("./data/CamState.data","r").read()
                  
                  if state =="True" :
-                     break;
+                     quit()
             except:
                  print("cannot open file")
             # Capture frame-by-frame
@@ -700,23 +726,23 @@ def camera():
                 flags=cv2.CASCADE_SCALE_IMAGE
             )
       
-            GPIO.output(12, False)
+            GPIO.output(24, False)
             for (x, y, w, h) in faces:
                 writeloginf(str(int(w/2) + x) + ' , ' + str(int(h/2) + y))
-                GPIO.output(12, True)
+                GPIO.output(24, True)
                 facelocationx = int(w/2) + x
                 facelocationy = int(h/2) + y
-                X = int((x / width)*100)
-                Y = int((x / height)*100)
+                X = int((((w/2) + x) / width)*100)
+                Y = 100 - int((((h/2) + y) / height)*100)
                 print("X: "+ str(X)) #  %
                 print("Y: "+ str(Y))
-                sleep(0.2)
+                sleep(0.1)
                 try :
                  datafile = open("./data/Handpos.data","w+")
     
                 except:
                  print("cannot open file")
-                datafile.write(str(X)+ "|"+str(Y))
+                datafile.write("02|"+str(X)+ "|"+str(Y))
                 datafile.flush()
                 datafile.close()
 
@@ -967,7 +993,7 @@ while True:
              backupfile.write("02")
              backupfile.flush()
              backupfile.close()
-             playrandomloop(False,"./music1/",[])
+             PlayMusic(False,"./music1/",[])
              #open("./data/backup.data", 'w').close()
              
              #backupfile.write("10")
@@ -1002,7 +1028,7 @@ while True:
                  writeloginf("File: "+ pllist[listcount])
              playlist.close()
              if  commandcode[1] == 0:
-                 playrandomloop(False,"./music/",pllist)
+                 PlayMusic(False,"./music/",pllist)
                  commandcode = [0,0]
              elif commandcode[1] == 1:
                  try: 
@@ -1015,7 +1041,7 @@ while True:
                  comm = backupfile.read()
                  backupfile.flush()
                  backupfile.close()
-                 playrandomloop(False,"./music/",pllist)
+                 PlayMusic(False,"./music/",pllist)
                  commandcode = [0,1]
                  try:
                   pygame.mixer.init()
@@ -1038,7 +1064,7 @@ while True:
              backupfile.write("02")
              backupfile.flush()
              backupfile.close()
-             playrandomloop(False,"./music/",[])
+             PlayMusic(False,"./music/",[])
              #open("./data/backup.data", 'w').close()
              
              #backupfile.write("10")
@@ -1073,7 +1099,7 @@ while True:
              comm = backupfile.read()
              backupfile.flush()
              backupfile.close()
-             playrandomloop(True,"./sleep/",[])
+             PlayMusic(True,"./sleep/",[])
              commandcode = [0,1]
              try:
                  pygame.mixer.init()
@@ -1087,7 +1113,7 @@ while True:
              # schedule.every().day.at(alarmtime).do(playalarm)
              #except:
              #    writelogerr("Cannot set alarm")
-             playrandomloop(True,"./music1/",[])
+             PlayMusic(True,"./music1/",[])
              commandcode = [0,1]
              try:
                  pygame.mixer.init()
@@ -1111,7 +1137,7 @@ while True:
              comm = backupfile.read()
              backupfile.flush()
              backupfile.close()
-             playrandomloop(True,"./music/",[])
+             PlayMusic(True,"./music/",[])
              commandcode = [0,1]
              try:
                  pygame.mixer.init()

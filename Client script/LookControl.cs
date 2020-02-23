@@ -27,8 +27,8 @@ public class LookControl : MonoBehaviour
     private float tarY;
     public void moving_target(string[] data)
     {
-        Debug.Log("X " + data[0]);
-        Debug.Log("Y " + data[1]);
+        Debug.Log("X " + data[1]);
+        Debug.Log("Y " + data[2]);
         recpos = data;
 
         moving = true;
@@ -54,61 +54,14 @@ public class LookControl : MonoBehaviour
     private void FixedUpdate()
     {
 
-        if (recpos[0] != "")
+        if (recpos[1] != "")
         {
-            tarX = (float.Parse(recpos[0]) / 100) * 6 - 3;
-            tarY = (float.Parse(recpos[1]) / 100) * 8 - 5;
+            tarX = (float.Parse(recpos[1]) / 100) * 6 - 1;
+            tarY = (float.Parse(recpos[2]) / 100) * 8 - 5;
             target.position = Vector3.Lerp(target.position, new Vector3(tarX, tarY, 0), Time.deltaTime * Speed);
         }
 
-        #region comment
-        //if (targetmoving)
-        //{
-        //    float tarX = (float.Parse(recpos[0]) / 100) * 8 - 5;
-        //    float tarY = (float.Parse(recpos[1]) / 100) * 6 - 3;
-        //    if (Mathf.Abs(target.position.x) - Mathf.Abs(tarX) < SpaceX + 0.05f)
-        //    {
-        //        target.position = new Vector3(tarX, target.position.y, target.position.z);
-        //        targetmoving = false;
-        //    }
-        //    if (Mathf.Abs(target.position.y) - Mathf.Abs(tarY) < SpaceY + 0.05f)
-        //    {
-        //        target.position = new Vector3(target.position.x, tarY, target.position.z);
-        //        targetmoving = false;
-        //    }
-        //    if (target.position.x != tarX)
-        //    {
-
-        //        if (target.position.x > tarX)
-        //        {
-        //            target.position = new Vector3(target.position.x - SpaceX, target.position.y, target.position.z);
-        //        }
-        //        else if (target.position.x < tarX)
-        //        {
-        //            target.position = new Vector3(target.position.x + SpaceX, target.position.y, target.position.z);
-        //        }
-
-
-        //    }
-        //    if (target.position.y != tarY)
-        //    {
-
-        //        if (target.position.y > tarY)
-        //        {
-        //            target.position = new Vector3(target.position.x, target.position.y - SpaceY, target.position.z);
-        //        }
-        //        else if (target.position.y < tarY)
-        //        {
-        //            target.position = new Vector3(target.position.x, target.position.y + SpaceY, target.position.z);
-        //        }
-
-
-        //    }
-        //    Debug.Log("Moving");
-
-
-        // }
-        #endregion
+       
         //Debug.Log("Time: " + time.ToString());
         if (moving == false)
         {
@@ -135,7 +88,7 @@ public class LookControl : MonoBehaviour
             float eyeY = Mathf.Lerp(bgY, (((targetY + 5.3f) / 4) - 1f), t);
             angleX = Mathf.Lerp(bgX, (((targetX + 2) / 3) - 1f), t);
             angleY = Mathf.Lerp(bgY, (((targetY + 4) / 4)-1f), t);
-            Debug.Log("target: X " + targetX.ToString() + " Y: " + targetY.ToString());
+            Debug.Log("target: X " + targetX.ToString() + " Y: " + targetY.ToString()+"received data: "+recpos[1]+ "  "+ recpos[2]);
             t += 0.5f * Time.deltaTime;
             animator.SetFloat("LookPosHoz", angleX);
             animator.SetFloat("LookPosVer", angleY);

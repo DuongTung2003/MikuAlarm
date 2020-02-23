@@ -10,6 +10,7 @@ public class uichange : MonoBehaviour
     public GameObject open2;
     public GameObject close;
     public GameObject close2;
+    public GameObject open3;
     public bool Self;
     public Client client;
     public bool onopen;
@@ -19,47 +20,39 @@ public class uichange : MonoBehaviour
         if (onStart)
         {
 
-            if (open)
-            {
-                open.SetActive(true);
-            }
-
-            if (open2)
-            {
-                open2.SetActive(true);
-            }
-            if (close)
-            {
-                close.SetActive(false);
-            }
-            if (close2)
-            {
-                close2.SetActive(false);
-            }
-            if (Self)
-            {
-                gameObject.SetActive(false);
-            }
+            change();
         }
     }
     public void change()
     {
         if (open)
         {
-            open.SetActive(true);
+            open.GetComponent<CanvasGroup>().alpha = 1f;
+            open.GetComponent<CanvasGroup>().interactable = true;
+            open.GetComponent<CanvasGroup>().blocksRaycasts = true;
         }
 
         if (open2)
         {
-            open2.SetActive(true);
+            open2.GetComponent<CanvasGroup>().alpha = 1f;
+            open2.GetComponent<CanvasGroup>().interactable = true;
+            open2.GetComponent<CanvasGroup>().blocksRaycasts = true;
         }
         if (close)
         {
-            close.SetActive(false);
+            close.GetComponent<CanvasGroup>().alpha = 0f;
+            close.GetComponent<CanvasGroup>().interactable = false;
+            close.GetComponent<CanvasGroup>().blocksRaycasts = false;
         }
         if (close2)
         {
-            close2.SetActive(false);
+            close2.GetComponent<CanvasGroup>().alpha = 0f;
+            close2.GetComponent<CanvasGroup>().interactable = false;
+            close2.GetComponent<CanvasGroup>().blocksRaycasts = false;
+        }
+        if (open3)
+        {
+            open3.SetActive(true);
         }
         if (Self)
         {
